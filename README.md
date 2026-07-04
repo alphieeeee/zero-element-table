@@ -14,6 +14,12 @@ pnpm dev
 bun dev
 ```
 
+If you are setting up GSAP animations in a fresh project, install both GSAP and the React integration package first:
+
+```bash
+npm install gsap @gsap/react
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
