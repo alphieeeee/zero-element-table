@@ -16,7 +16,7 @@ const TransitionLayout: React.FC<TransitionLayoutProps> = ({
     const { pageTransitionIn } = usePageTransition();
     
     useGSAP(() => {
-      // pageTransitionIn();
+      pageTransitionIn();
     }, { scope: mainContainer });
 
   return (
@@ -25,9 +25,9 @@ const TransitionLayout: React.FC<TransitionLayoutProps> = ({
         <div id='main-container' ref={mainContainer} className={`main-container relative h-full`}>
           {children}
         </div>
-        {/* <div className={`transition-overlays absolute w-full h-full top-0 left-0 z-40 pointer-events-none bg-red-500`}>
-          <div className={`transition-overlay absolute w-full h-full top-0 left-0 pointer-events-auto bg-red-500`}></div>
-        </div> */}
+        <div className={`transition-overlay absolute w-full h-full top-0 left-0 z-40 pointer-events-none bg-white`}>
+          <div className={`transition-overlay absolute w-full h-full top-0 left-0 pointer-events-auto bg-white`}></div>
+        </div>
       </SmootherContainer>
     </>
   )
