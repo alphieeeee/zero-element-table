@@ -37,7 +37,7 @@ const SmootherContainer: React.FC<SmootherContainerProps> = ({
   return (
 		<>
 			<div id='smooth-wrapper' ref={smoothWrapper}>
-      			<div id='smooth-content' ref={smoothContent} className={`relative h-full`}>
+      			<div id='smooth-content' ref={smoothContent} className={`relative`}>
 					{children}
 				</div>
 			</div>
