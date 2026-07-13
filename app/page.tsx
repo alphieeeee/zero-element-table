@@ -1,65 +1,205 @@
-import Image from "next/image";
+"use client";
+
+import { Fragment, useMemo, useState } from "react";
+
+type Operator = "add" | "subtract" | "multiply" | "divide";
+
+const attackers = [
+  "Wind",
+  "Earth",
+  "Water",
+  "Fire",
+  "Neutral",
+  "Holy",
+  "Shadow",
+  "Ghost",
+  "Undead",
+  "Poison",
+];
+
+const defenders = [...attackers];
+
+const baseTable = [
+  [0.25, 0.5, 2, 1, 1, 0.75, 1, 1, 1, 0.75],
+  [2, 0.25, 1, 0.5, 1, 0.75, 1, 1, 1, 0.75],
+  [0.5, 1, 0.25, 2, 1, 0.75, 1, 1, 1.5, 0.75],
+  [1, 2, 0.5, 0.25, 1, 0.75, 1, 1, 2, 0.75],
+  [1, 1, 1, 1, 1, 1, 1, 0.25, 1, 1],
+  [1, 1, 1, 1, 1, 0.25, 2, 1, 2, 1.25],
+  [1, 1, 1, 1, 1, 2, 0.25, 1, 0.25, 0.25],
+  [1, 1, 1, 1, 0.25, 0.75, 0.75, 2, 1.75, 0.75],
+  [0.5, 0.5, 0.5, 0.5, 1, 1.75, 0.25, 1, 0.25, 0.25],
+  [1.25, 1.25, 1, 1.25, 1, 0.5, 0.25, 0.5, 0.25, 0.25],
+];
+
+function formatValue(value: number) {
+  const rounded = Math.round(value * 1000) / 1000;
+  return Number.isInteger(rounded) ? `${rounded}` : `${rounded}`;
+}
+
+function calculateLevelCoefficient(
+  coefficient: number,
+  srcAtkLevel: number,
+  tarDefLevel: number
+) {
+  let elementRate = coefficient;
+
+  if (tarDefLevel >= 3) {
+    elementRate =
+      elementRate + (srcAtkLevel - 1) * 0.25 - 0.25 - (tarDefLevel - 2) * 0.125;
+  } else if (tarDefLevel === 2) {
+    elementRate = elementRate + (srcAtkLevel - 1) * 0.25 - 0.25;
+  } else {
+    elementRate = elementRate + (srcAtkLevel - 1) * 0.25;
+  }
+
+  return Math.max(0, elementRate);
+}
+
+function calculateCoefficient(
+  coefficient: number,
+  selectedOperator: Operator,
+  globalModifier: number
+) {
+  switch (selectedOperator) {
+    case "add":
+      return coefficient + globalModifier;
+    case "subtract":
+      return globalModifier - coefficient;
+    case "multiply":
+      return coefficient * globalModifier;
+    case "divide":
+      return globalModifier === 0 ? coefficient : coefficient / globalModifier;
+  }
+}
 
 export default function Home() {
+  const [selectedOperator, setSelectedOperator] = useState<Operator>("add");
+  const [globalModifier, setGlobalModifier] = useState(0);
+  const [attackerLevel, setAttackerLevel] = useState(1);
+  const [defenderLevel, setDefenderLevel] = useState(1);
+
+  const finalTable = useMemo(
+    () =>
+      baseTable.map((row) =>
+        row.map((coefficient) =>
+          calculateCoefficient(
+            calculateLevelCoefficient(coefficient, attackerLevel, defenderLevel),
+            selectedOperator,
+            globalModifier
+          )
+        )
+      ),
+    [attackerLevel, defenderLevel, globalModifier, selectedOperator]
+  );
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center font-sans h-full">
-      {/* <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen px-4 py-8 text-[#ceccff]">
+      <section className="mx-auto flex w-full max-w-[1400px] flex-col gap-6">
+        <div className="flex flex-col gap-4 border border-[#ceccff]/40 p-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="table-content font-semibold tracking-tight">
+              Element Damage Table
+            </h1>
+            <p className="table-content mt-1 text-[#ceccff]/80">
+              Adjust the formula and the table updates from the coefficient.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 lg:flex lg:flex-wrap">
+            <label className="table-content flex flex-col gap-2">
+              <span className="font-medium">Attacker level</span>
+              <select
+                value={attackerLevel}
+                onChange={(e) => setAttackerLevel(Number(e.target.value))}
+                className="w-full min-w-0 border border-[#ceccff] bg-transparent px-3 py-2 text-[#ceccff] outline-none lg:min-w-[160px]"
+              >
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+              </select>
+            </label>
+
+            <label className="table-content flex flex-col gap-2">
+              <span className="font-medium">Defender level</span>
+              <select
+                value={defenderLevel}
+                onChange={(e) => setDefenderLevel(Number(e.target.value))}
+                className="w-full min-w-0 border border-[#ceccff] bg-transparent px-3 py-2 text-[#ceccff] outline-none lg:min-w-[160px]"
+              >
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+              </select>
+            </label>
+
+            <label className="table-content flex flex-col gap-2">
+              <span className="font-medium">Operator</span>
+              <select
+                value={selectedOperator}
+                onChange={(e) =>
+                  setSelectedOperator(e.target.value as Operator)
+                }
+                className="w-full min-w-0 border border-[#ceccff] bg-transparent px-3 py-2 text-[#ceccff] outline-none lg:min-w-[160px]"
+              >
+                <option value="add">Addition</option>
+                <option value="subtract">Subtraction</option>
+                <option value="multiply">Multiplication</option>
+                <option value="divide">Division</option>
+              </select>
+            </label>
+
+            <label className="table-content flex flex-col gap-2">
+              <span className="font-medium">globalModifier</span>
+              <input
+                type="number"
+                step="1"
+                value={globalModifier}
+                onChange={(e) => setGlobalModifier(Number(e.target.value))}
+                className="w-full min-w-0 border border-[#ceccff] bg-transparent px-3 py-2 text-[#ceccff] outline-none lg:min-w-[160px]"
+              />
+            </label>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div className="border border-[#ceccff]/40">
+          <div
+            className="grid text-[#ceccff]"
+            style={{
+              gridTemplateColumns: `110px repeat(${defenders.length}, minmax(0, 1fr))`,
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <div className="border border-[#ceccff]/40 px-3 py-3" />
+            {defenders.map((defender) => (
+              <div
+                key={defender}
+                className="table-content border border-[#ceccff]/40 px-3 py-3 text-left font-medium"
+              >
+                {defender}
+              </div>
+            ))}
+
+            {attackers.map((attacker, rowIndex) => (
+              <Fragment key={attacker}>
+                <div className="table-content border border-[#ceccff]/40 px-3 py-3 text-left font-medium">
+                  {attacker}
+                </div>
+
+                {baseTable[rowIndex].map((coefficient, colIndex) => (
+                  <div
+                    key={`${attacker}-${defenders[colIndex]}`}
+                    className="table-content border border-[#ceccff]/40 px-3 py-3 text-left"
+                  >
+                    {formatValue(finalTable[rowIndex][colIndex])}
+                  </div>
+                ))}
+              </Fragment>
+            ))}
+          </div>
         </div>
-      </main> */}
-    </div>
+      </section>
+    </main>
   );
 }
