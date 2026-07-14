@@ -66,8 +66,12 @@ function calculateLevelCoefficient(
 function calculateCoefficient(
   coefficient: number,
   selectedOperator: Operator,
-  globalModifier: number
+  globalModifier: number | null
 ) {
+  if (globalModifier === null || Number.isNaN(globalModifier)) {
+    return null;
+  }
+
   switch (selectedOperator) {
     case "add":
       return coefficient + globalModifier;
