@@ -25,6 +25,12 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {
@@ -35,7 +41,47 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+header {
+  border-bottom-width: 0.5px;
+  border-style: solid;
+  border-color: #ceccff;
+  font-size: calc((24 / 1440) * 100vw);
+}
+
+footer {
+  border-top-width: 0.5px;
+  border-style: solid;
+  border-color: #ceccff;
+  font-size: calc((24 / 1440) * 100vw);
+}
+
+h1 {
+  font-size: calc((48 / 1440) * 100vw);
+}
+
+p {
+  font-size: calc((24 / 1440) * 100vw);
+}
+
+.header-content {
+  font-size: calc((16 / 1440) * 100vw);
+}
+
 .table-content {
-  font-size: calc((12 / 1440) * 100vw);
-  /* font-size: 11px; */
+  font-size: calc((20 / 1440) * 100vw);
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+* {
+  scrollbar-width: none;
 }

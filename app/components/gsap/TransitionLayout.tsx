@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { useGSAP } from "@gsap/react";
 import { usePageTransition } from '../../../lib/gsap/usePageTransition';
 import SmootherContainer from './SmootherContainer';
+// import LogoHeader from '../LogoHeader';
 
 interface TransitionLayoutProps {
   children: React.ReactNode;
@@ -22,8 +23,14 @@ const TransitionLayout: React.FC<TransitionLayoutProps> = ({
   return (
     <>
       <SmootherContainer>
-        <div id='main-container' ref={mainContainer} className={`main-container relative h-full`}>
+        <div id='main-container' ref={mainContainer} className={`main-container relative min-h-[100vh] min-h-[100dvh] flex flex-col`}>
+          {/* <LogoHeader /> */}
           {children}
+          <footer className="p-5 text-center">
+            <p className="m-5">
+              We out here killin chillin fussin like a motherfuckin villain
+            </p>
+          </footer>
         </div>
         <div className={`transition-overlay absolute w-full h-full top-0 left-0 z-40 pointer-events-none bg-white`}>
           <div className={`transition-overlay absolute w-full h-full top-0 left-0 pointer-events-auto bg-white`}></div>
